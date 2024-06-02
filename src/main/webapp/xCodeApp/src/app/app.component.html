@@ -1,0 +1,155 @@
+<section class="flex flex-column items-center justify-center m-5">
+  <form class="w-1/3" [formGroup]="currencyValueForm">
+    <div class="space-y-12">
+      <div class="">
+        <div class="sm:col-span-2 sm:col-start-1">
+          <label
+            for="name"
+            class="block text-sm font-medium leading-6 text-gray-900"
+            >First & Last Name</label
+          >
+          <div class="mt-2">
+            <input
+              formControlName="name"
+              type="text"
+              name="name"
+              id="name"
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+            <mat-error
+              *ngIf="
+                currencyValueForm.get('name').invalid &&
+                (currencyValueForm.get('name').dirty ||
+                  currencyValueForm.get('name').touched)
+              "
+              >This field is required</mat-error
+            >
+          </div>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label
+            for="currency"
+            class="block text-sm font-medium leading-6 text-gray-900"
+            >Currency Code</label
+          >
+          <div class="mt-2">
+            <input
+              formControlName="currency"
+              type="text"
+              name="currency"
+              id="currency"
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <mat-error
+            *ngIf="
+              currencyValueForm.get('currency').invalid &&
+              (currencyValueForm.get('currency').dirty ||
+                currencyValueForm.get('currency').touched)
+            "
+            >Currency code should contain 3 letters</mat-error
+          >
+        </div>
+        <div class="sm:col-span-3">
+          <button
+            mat-flat-button
+            color="primary"
+            [disabled]="currencyValueForm.invalid"
+            class="mr-2"
+            (click)="getCurrencyValue()"
+          >
+            Show value
+          </button>
+          <button
+            mat-flat-button
+            color="primary"
+            class="m-2"
+            (click)="getHistoryData()"
+          >
+            History
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="container flex justify-center items-center w-full"
+        *ngIf="currencyValue"
+      >
+        <div
+          class="container-currency-value"
+          *ngIf="!isLoading && currencyValue"
+        >
+          <h2 class="block text-sm font-medium leading-6 text-gray-900">
+            Currency Value:
+            <span class="text-2xl text-gray-900">{{ currencyValue }}</span>
+          </h2>
+        </div>
+      </div>
+    </div>
+  </form>
+</section>
+
+<mat-spinner *ngIf="isLoading" class="w-1/3 mx-auto"></mat-spinner>
+<div
+  class="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 w-1/3 mx-auto"
+  role="alert"
+  *ngIf="showError"
+>
+  <svg
+    class="flex-shrink-0 inline w-4 h-4 me-3"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 20 20"
+  >
+    <path
+      d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+    />
+  </svg>
+  <span class="sr-only">Info</span>
+  <div><span class="font-medium">Alert!</span> {{ errorMessage }}</div>
+</div>
+<mat-spinner *ngIf="isLoadingTable" class="w-full mx-auto"></mat-spinner>
+<div
+  class="mat-elevation-z8 mx-24 mb-5 pb-4 mt-4"
+  *ngIf="historyDataToTable && !isLoadingTable"
+>
+  <table mat-table [dataSource]="historyDataToTable">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>First & Last Name</th>
+      <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="currency">
+      <th mat-header-cell *matHeaderCellDef>Currency code</th>
+      <td mat-cell *matCellDef="let element">{{ element.currency }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="value">
+      <th mat-header-cell *matHeaderCellDef>Currency value</th>
+      <td mat-cell *matCellDef="let element">{{ element.value }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="date">
+      <th mat-header-cell *matHeaderCellDef>Date</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.date | date : "yyyy-MM-dd HH:mm:ss" }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <mat-paginator
+    [pageSizeOptions]="[5, 10, 20]"
+    showFirstLastButtons
+    aria-label="Select page of periodic elements"
+    (page)="handlePageEvent($event)"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [length]="length"
+  >
+  </mat-paginator>
+</div>
